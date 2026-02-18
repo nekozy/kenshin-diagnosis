@@ -1,244 +1,154 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>企業の健全性ライン診断（簡易）</title>
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; margin:0; background:#f6f7f9; color:#111}
-    .wrap{max-width:720px; margin:0 auto; padding:16px}
-    .card{background:#fff; border-radius:14px; padding:16px; box-shadow:0 2px 12px rgba(0,0,0,.06); margin:12px 0}
-    h1{font-size:20px; margin:0 0 8px}
-    h2{font-size:16px; margin:0 0 8px}
-    .q{margin:14px 0}
-    .q label{display:block; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; margin:8px 0; cursor:pointer}
-    .q input{margin-right:8px}
-    .btn{display:inline-block; width:100%; padding:12px 14px; border-radius:12px; border:0; cursor:pointer; font-weight:700; font-size:15px}
-    .btnPrimary{background:#111; color:#fff}
-    .btnGhost{background:#fff; border:1px solid #e5e7eb}
-    .muted{color:#6b7280; font-size:13px}
-    .pill{display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:13px}
-    .danger{background:#fee2e2}
-    .warn{background:#fef3c7}
-    .safe{background:#dcfce7}
-    .row{display:flex; gap:10px; flex-wrap:wrap}
-    .row > *{flex:1 1 220px}
-    .input, select{width:100%; padding:12px 12px; border-radius:12px; border:1px solid #e5e7eb; font-size:15px}
-    .check label{display:flex; gap:8px; align-items:flex-start; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; margin:8px 0; cursor:pointer}
-    .hide{display:none}
-    a{color:inherit}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>企業の健全性ライン診断</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial; margin:0; background:#f5f6f8; color:#111}
+.wrap{max-width:720px; margin:0 auto; padding:16px}
+.card{background:#fff; border-radius:14px; padding:18px; box-shadow:0 2px 12px rgba(0,0,0,.06); margin:14px 0}
+h1{font-size:20px; margin:0 0 8px}
+h2{font-size:16px; margin:0 0 10px}
+.q{margin:14px 0}
+.q label{display:block; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; margin:8px 0; cursor:pointer}
+.q input{margin-right:8px}
+.btn{width:100%; padding:12px; border-radius:12px; border:0; cursor:pointer; font-weight:700; font-size:15px}
+.btnPrimary{background:#111; color:#fff}
+.btnGhost{background:#fff; border:1px solid #e5e7eb}
+.muted{color:#6b7280; font-size:13px}
+.pill{display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:13px}
+.danger{background:#fee2e2}
+.warn{background:#fef3c7}
+.safe{background:#dcfce7}
+.input, select{width:100%; padding:12px; border-radius:12px; border:1px solid #e5e7eb; font-size:15px; margin-top:8px}
+.check label{display:flex; gap:8px; align-items:flex-start; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; margin:8px 0; cursor:pointer}
+.hide{display:none}
+</style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>企業の健全性ライン診断（3分）</h1>
-      <div class="muted">
-        ※簡易判定です。入力情報はこのページ内で計算するだけで、<b>自動保存しません</b>（送信するのは任意の相談フォームのみ）。
-      </div>
-    </div>
+<div class="wrap">
 
-    <div class="card" id="diagCard">
-      <h2>1) 簡易診断（3項目）</h2>
+<div class="card">
+<h1>企業の健全性ライン診断（3分）</h1>
+<div class="muted">簡易判定です。入力内容は保存されません。</div>
+</div>
 
-      <div class="q" id="qCash">
-        <div><b>Q1. 手元資金は固定費の何か月分ありますか？</b></div>
-        <label><input type="radio" name="cash" value="0">1ヶ月未満</label>
-        <label><input type="radio" name="cash" value="1">1〜3ヶ月</label>
-        <label><input type="radio" name="cash" value="2">3ヶ月以上</label>
-      </div>
+<div class="card" id="diagCard">
+<h2>簡易診断</h2>
 
-      <div class="q" id="qDebt">
-        <div><b>Q2. 借入返済は余裕がありますか？</b></div>
-        <label><input type="radio" name="debt" value="0">きつい</label>
-        <label><input type="radio" name="debt" value="1">普通</label>
-        <label><input type="radio" name="debt" value="2">問題ない</label>
-      </div>
+<div class="q">
+<b>Q1. 手元資金は固定費の何か月分ありますか？</b>
+<label><input type="radio" name="cash" value="0">1ヶ月未満</label>
+<label><input type="radio" name="cash" value="1">1〜3ヶ月</label>
+<label><input type="radio" name="cash" value="2">3ヶ月以上</label>
+</div>
 
-      <div class="q" id="qProfit">
-        <div><b>Q3. ここ1年の利益は？</b></div>
-        <label><input type="radio" name="profit" value="0">赤字</label>
-        <label><input type="radio" name="profit" value="1">トントン</label>
-        <label><input type="radio" name="profit" value="2">黒字</label>
-      </div>
+<div class="q">
+<b>Q2. 借入返済は余裕がありますか？</b>
+<label><input type="radio" name="debt" value="0">きつい</label>
+<label><input type="radio" name="debt" value="1">普通</label>
+<label><input type="radio" name="debt" value="2">問題ない</label>
+</div>
 
-      <button class="btn btnPrimary" id="btnJudge">判定する</button>
-      <div class="muted" style="margin-top:10px;">
-        ※「社名」「住所」などは入力不要にしています（登録率優先）。
-      </div>
-    </div>
+<div class="q">
+<b>Q3. ここ1年の利益は？</b>
+<label><input type="radio" name="profit" value="0">赤字</label>
+<label><input type="radio" name="profit" value="1">トントン</label>
+<label><input type="radio" name="profit" value="2">黒字</label>
+</div>
 
-    <div class="card hide" id="resultCard">
-      <h2>2) 判定結果</h2>
-      <div id="badge"></div>
-      <div style="margin:10px 0; font-size:15px;" id="summary"></div>
+<button class="btn btnPrimary" onclick="judge()">判定する</button>
+</div>
 
-      <div class="card" style="box-shadow:none; border:1px solid #e5e7eb; margin:12px 0;">
-        <b>次の一手</b>
-        <ul id="tips" style="margin:10px 0 0 18px;"></ul>
-      </div>
+<div class="card hide" id="resultCard">
+<h2>判定結果</h2>
+<div id="resultBadge"></div>
+<div id="resultText" style="margin-top:10px;"></div>
 
-      <button class="btn btnGhost" id="btnRecalc">入力を修正する</button>
-    </div>
+<div style="margin-top:18px;">
+<button class="btn btnGhost" onclick="location.reload()">入力をやり直す</button>
+</div>
+</div>
 
-    <div class="card hide" id="leadCard">
-      <h2>3) 相談（任意）</h2>
-      <div class="muted">チェックだけでもOK。送信後、入力内容が控えとして表示されます。</div>
+<div class="card hide" id="leadCard">
+<h2>詳細診断（任意）</h2>
+<div class="muted">より詳細な分析をご希望の場合はご連絡ください。</div>
 
-      <div class="row" style="margin-top:12px;">
-        <input class="input" id="email" type="email" placeholder="メール（任意）">
-        <select id="industry">
-          <option value="">業種を選択（任意）</option>
-          <option>建設</option>
-          <option>製造</option>
-          <option>産廃/廃棄物</option>
-          <option>医療/介護</option>
-          <option>不動産</option>
-          <option>飲食</option>
-          <option>IT/サービス</option>
-          <option>その他</option>
-        </select>
-      </div>
+<input class="input" id="email" type="email" placeholder="メール（任意）">
 
-      <div style="margin-top:12px;"><b>相談内容（任意・複数選択可）</b></div>
-      <div class="check" id="topics">
-        <label><input type="checkbox" value="資金繰り/運転資金が不安">資金繰り/運転資金が不安</label>
-        <label><input type="checkbox" value="借入返済の負担を見直したい">借入返済の負担を見直したい</label>
-        <label><input type="checkbox" value="代表者の万一に備えたい">代表者の万一に備えたい</label>
-        <label><input type="checkbox" value="従業員向け福利厚生を整えたい">従業員向け福利厚生を整えたい</label>
-        <label><input type="checkbox" value="決算3月で対策を急ぎたい">決算（3月等）で対策を急ぎたい</label>
-      </div>
+<select id="industry">
+<option value="">業種（任意）</option>
+<option>建設</option>
+<option>製造</option>
+<option>医療・介護</option>
+<option>不動産</option>
+<option>飲食</option>
+<option>IT・サービス</option>
+<option>その他</option>
+</select>
 
-      <button class="btn btnPrimary" id="btnSend">相談内容を送る</button>
+<div style="margin-top:12px;"><b>相談テーマ（任意）</b></div>
 
-      <div class="muted" style="margin-top:10px;">
-        送信先はGoogleフォームにしています（スプレッドシート管理が簡単）。
-      </div>
-      <div class="muted" id="sendNote" style="margin-top:6px;"></div>
-    </div>
+<div class="check">
+<label><input type="checkbox">資金繰り</label>
+<label><input type="checkbox">借入返済</label>
+<label><input type="checkbox">事業継続対策</label>
+<label><input type="checkbox">福利厚生整備</label>
+<label><input type="checkbox">決算前対策</label>
+</div>
 
-    <div class="card">
-      <div class="muted">
-        設置用トーク（現場）：「いきなり商品の話はしません。3分の簡易診断だけどうぞ。結果に応じて“次に確認すべきポイント”が出ます」
-      </div>
-    </div>
-  </div>
+<button class="btn btnPrimary" style="margin-top:10px;">送信（後日連絡）</button>
+
+</div>
+
+</div>
 
 <script>
-  // ====== ここを差し替え ======
-  // Googleフォームの「事前入力リンク」を作って、そのURLを貼る（後述）
-  const GOOGLE_FORM_PREFILL_URL = "https://docs.google.com/forms/d/e/XXXXXXXXXXXX/viewform?usp=pp_url";
+function judge(){
+let cash=document.querySelector('input[name="cash"]:checked');
+let debt=document.querySelector('input[name="debt"]:checked');
+let profit=document.querySelector('input[name="profit"]:checked');
 
-  // Googleフォームの各設問の entry.XXXX のID（後述）
-  const FORM_ENTRY = {
-    result: "entry.1111111111",
-    email: "entry.2222222222",
-    industry: "entry.3333333333",
-    topics: "entry.4444444444"
-  };
-  // ===========================
+if(!cash||!debt||!profit){
+alert("すべて選択してください。");
+return;
+}
 
-  const $ = (id) => document.getElementById(id);
+cash=parseInt(cash.value);
+debt=parseInt(debt.value);
+profit=parseInt(profit.value);
 
-  function getRadioValue(name){
-    const el = document.querySelector(`input[name="${name}"]:checked`);
-    return el ? parseInt(el.value, 10) : null;
-  }
+let level="";
+let badge="";
+let text="";
 
-  function judge(cash, debt, profit){
-    // 危険条件：資金<1ヶ月 or (赤字 and 返済きつい)
-    if (cash === 0 || (profit === 0 && debt === 0)) return "危険";
-    // 安全条件：資金>=3ヶ月 and 黒字 and 返済余裕
-    if (cash === 2 && profit === 2 && debt === 2) return "安全";
-    // その他は要注意
-    return "要注意";
-  }
+if(cash===0 || (profit===0 && debt===0)){
+level="危険";
+badge='<span class="pill danger">🔴 危険</span>';
+text="資金ショートまたは返済圧迫の可能性があります。早期の見直しが推奨されます。";
+}
+else if(cash===2 && debt===2 && profit===2){
+level="安全";
+badge='<span class="pill safe">🟢 安全</span>';
+text="現状は健全な状態です。継続的なモニタリングをおすすめします。";
+}
+else{
+level="要注意";
+badge='<span class="pill warn">🟡 要注意</span>';
+text="現状は維持されていますが、外部環境変化に注意が必要です。";
+}
 
-  function renderResult(level){
-    const badge = $("badge");
-    const summary = $("summary");
-    const tips = $("tips");
-    tips.innerHTML = "";
+document.getElementById("resultBadge").innerHTML=badge;
+document.getElementById("resultText").innerHTML=text;
 
-    if (level === "危険"){
-      badge.innerHTML = `<span class="pill danger">🔴 危険</span>`;
-      summary.innerHTML = `資金ショート（または返済圧迫）の可能性が高い状態です。`;
-      [
-        "まず「いくらまで固定費が耐えられるか（月数）」を明確化",
-        "代表者の不在・入院で売上が止まる前提で“資金の穴”を見える化",
-        "緊急時に潰れない「つなぎ資金」の設計（保険・融資・内部留保の組合せ）"
-      ].forEach(t => tips.innerHTML += `<li>${t}</li>`);
-    } else if (level === "要注意"){
-      badge.innerHTML = `<span class="pill warn">🟡 要注意</span>`;
-      summary.innerHTML = `現状は回っていますが、外部環境の悪化で崩れる余地があります。`;
-      [
-        "返済・固定費の“重さ”を見直し（削れる支出の特定）",
-        "代表者・キーマンの病気/事故で止まる業務がどこか棚卸し",
-        "決算期前に「利益の守り」と「資金の守り」を分けて設計"
-      ].forEach(t => tips.innerHTML += `<li>${t}</li>`);
-    } else {
-      badge.innerHTML = `<span class="pill safe">🟢 安全</span>`;
-      summary.innerHTML = `数字上は健全です。ただし“守りの設計”が未整備だと一撃で崩れます。`;
-      [
-        "黒字倒産を避けるため、回収サイト/支払サイトの確認",
-        "代表者不在時の資金・事業継続の設計（保険の出番）",
-        "利益が出る会社ほど「節税」より「手元資金の厚み」が重要"
-      ].forEach(t => tips.innerHTML += `<li>${t}</li>`);
-    }
-  }
+document.getElementById("resultCard").classList.remove("hide");
+document.getElementById("leadCard").classList.remove("hide");
 
-  function buildPrefillUrl(level, email, industry, topics){
-    const params = new URLSearchParams();
-    params.set(FORM_ENTRY.result, level);
-    if (email) params.set(FORM_ENTRY.email, email);
-    if (industry) params.set(FORM_ENTRY.industry, industry);
-
-    // Googleフォームのチェックボックスは「改行区切り」で通ることが多い
-    if (topics && topics.length) params.set(FORM_ENTRY.topics, topics.join("\n"));
-
-    return GOOGLE_FORM_PREFILL_URL + (GOOGLE_FORM_PREFILL_URL.includes("?") ? "&" : "?") + params.toString();
-  }
-
-  let lastLevel = null;
-
-  $("btnJudge").addEventListener("click", () => {
-    const cash = getRadioValue("cash");
-    const debt = getRadioValue("debt");
-    const profit = getRadioValue("profit");
-
-    if (cash === null || debt === null || profit === null){
-      alert("3問すべて選択してください。");
-      return;
-    }
-
-    lastLevel = judge(cash, debt, profit);
-    renderResult(lastLevel);
-
-    $("resultCard").classList.remove("hide");
-    $("leadCard").classList.remove("hide");
-    window.scrollTo({ top: $("resultCard").offsetTop - 10, behavior: "smooth" });
-  });
-
-  $("btnRecalc").addEventListener("click", () => {
-    window.scrollTo({ top: $("diagCard").offsetTop - 10, behavior: "smooth" });
-  });
-
-  $("btnSend").addEventListener("click", () => {
-    if (!lastLevel){
-      alert("先に診断してください。");
-      return;
-    }
-
-    const email = $("email").value.trim();
-    const industry = $("industry").value;
-    const topics = Array.from(document.querySelectorAll('#topics input[type="checkbox"]:checked'))
-      .map(x => x.value);
-
-    const url = buildPrefillUrl(lastLevel, email, industry, topics);
-
-    $("sendNote").textContent = "フォームを開きます（最終送信はGoogleフォーム側で行います）。";
-    window.open(url, "_blank");
-  });
+window.scrollTo({top:document.getElementById("resultCard").offsetTop,behavior:"smooth"});
+}
 </script>
+
 </body>
 </html>
