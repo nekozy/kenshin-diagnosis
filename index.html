@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>企業の健全性ライン診断</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial; margin:0; background:#f5f6f8; color:#111}
+  .wrap{max-width:760px; margin:0 auto; padding:16px}
+  .card{background:#fff; border-radius:14px; padding:18px; box-shadow:0 2px 12px rgba(0,0,0,.06); margin:14px 0}
+  h1{font-size:20px; margin:0 0 8px}
+  h2{font-size:16px; margin:0 0 10px}
+  .muted{color:#6b7280; font-size:13px; line-height:1.5}
+  .q{margin:14px 0}
+  .q label{display:block; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; margin:8px 0; cursor:pointer}
+  .q input{margin-right:8px}
+  .btn{width:100%; padding:12px; border-radius:12px; border:0; cursor:pointer; font-weight:700; font-size:15px}
+  .btnPrimary{background:#111; color:#fff}
+  .btnGhost{background:#fff; border:1px solid #e5e7eb}
+  .btnRow{display:flex; gap:10px; flex-wrap:wrap}
+  .btnRow .btn{flex:1 1 220px}
+  .pill{display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:13px; margin-right:6px}
+  .danger{background:#fee2e2}
+  .warn{background:#fef3c7}
+  .safe{background:#dcfce7}
+  .type{background:#e0e7ff}
+  .sharebox{border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fafafa}
+  .shareline{font-size:16px; font-weight:800; line-height:1.5; margin:6px 0 0}
+  .small{font-size:12px; color:#6b7280}
+  .input, select{width:100%; padding:12px; border-radius:12px; border:1px solid #e5e7eb; font-size:15px; margin-top:8px}
+  .check label{display:flex; gap:8px; align-items:flex-start; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; margin:8px 0; cursor:pointer}
+  .hide{display:none}
+  ul{margin:10px 0 0 18px}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <div class="card">
+    <h1>企業の健全性ライン診断（3分）</h1>
+    <div class="muted">簡易判定です。入力内容はこのページ内で計算するだけで保存しません。</div>
+  </div>
+
+  <div class="card" id="diagCard">
+    <h2>簡易診断</h2>
+
+    <div class="q">
+      <b>Q1. 手元資金は固定費の何か月分ありますか？</b>
+      <label><input type="radio" name="cash" value="0">1ヶ月未満</label>
+      <label><input type="radio" name="cash" value="1">1〜3ヶ月</label>
+      <label><input type="radio" name="cash" value="2">3ヶ月以上</label>
+    </div>
+
+    <div class="q">
+      <b>Q2. 借入返済は余裕がありますか？</b>
+      <label><input type="radio" name="debt" value="0">きつい</label>
+      <label><input type="radio" name="debt" value="1">普通</label>
+      <label><input type="radio" name="debt" value="2">問題ない</label>
+    </div>
+
+    <div class="q">
+      <b>Q3. ここ1年の利益は？</b>
+      <label><input type="radio" name="profit" value="0">赤字</label>
+      <label><input type="radio" name="profit" value="1">トントン</label>
+      <label><input type="radio" name="profit" value="2">黒字</label>
+    </div>
+
+    <button class="btn btnPrimary" id="btnJudge">判定する</button>
+    <div class="muted" style="margin-top:10px;">※会社名などは入力不要（登録率優先）。</div>
+  </div>
+
+  <div class="card hide" id="resultCard">
+    <h2>判定結果</h2>
+    <div id="resultBadges"></div>
+
+    <!-- スクショで持ち帰れる一文 -->
+    <div class="sharebox" style="margin-top:12px;">
+      <div class="small">スクショ用まとめ（この一文だけ見ればOK）</div>
+      <div class="shareline" id="shareLine">—</div>
+      <div class="small" style="margin-top:6px;">※コピーして社内共有にも使えます</div>
+      <div class="btnRow" style="margin-top:10px;">
+        <button class="btn btnGhost" id="btnCopy">一文をコピー</button>
+        <button class="btn btnGhost" id="btnRecalc">入力を修正</button>
+      </div>
+    </div>
+
+    <div id="resultText" style="margin-top:12px;"></div>
+
+    <div class="card" style="box-shadow:none; border:1px solid #e5e7eb; margin-top:12px;">
+      <b>このタイプで確認すると速いポイント</b>
+      <ul id="points"></ul>
+    </div>
+  </div>
+
+  <div class="card hide" id="leadCard">
+    <h2>詳細診断（任意）</h2>
+    <div class="muted">より詳細な分析をご希望の場合は、下の内容を送信してください（Googleフォームが開きます）。</div>
+
+    <input class="input" id="email" type="email" placeholder="メール（任意）">
+
+    <select id="industry">
+      <option value="">業種（任意）</option>
+      <option value="建設">建設</option>
+      <option value="製造">製造</option>
+      <option value="医療・介護">医療・介護</option>
+      <option value="不動産">不動産</option>
+      <option value="飲食">飲食</option>
+      <option value="IT・サービス">IT・サービス</option>
+      <option value="その他">その他</option>
+    </select>
+
+    <div style="margin-top:12px;"><b>相談テーマ（任意・複数選択）</b></div>
+    <div class="check" id="topics">
+      <label><input type="checkbox" value="資金繰り">資金繰り</label>
+      <label><input type="checkbox" value="借入返済">借入返済</label>
+      <label><input type="checkbox" value="事業継続対策">事業継続対策</label>
+      <label><input type="checkbox" value="福利厚生整備">福利厚生整備</label>
+      <label><input type="checkbox" value="決算前対策">決算前対策</label>
+    </div>
+
+    <button class="btn btnPrimary" id="btnSend" style="margin-top:10px;">送信（Googleフォームを開く）</button>
+    <div class="muted" id="sendNote" style="margin-top:8px;"></div>
+  </div>
+
+</div>
+
+<script>
+/* =========================
+   Googleフォーム連携設定
+   =========================
+   1) Googleフォームで「事前入力したリンク」を作成して、そのURLを下に貼る
+   2) URL内の entry.XXXXXXXX を見て、下の FORM_ENTRY を埋める
+*/
+const GOOGLE_FORM_PREFILL_URL = "https://docs.google.com/forms/d/e/1FAIpQLScPD9BHKl6dmtzYAZinPgI7eKbT7KtVy_TtCuJcMJkboAgLvg/viewform?usp=pp_url";
+
+const FORM_ENTRY = {
+  level: "entry.1514386285",
+  type:  "entry.246823347",
+  share: "entry.1004278389",
+  email: "entry.1815653496",
+  industry:"entry.1991658394",
+  topics:"entry.1678540894"
+};
+/* ========================= */
+
+const $ = (id) => document.getElementById(id);
+
+function getChecked(name){
+  const el=document.querySelector(`input[name="${name}"]:checked`);
+  return el ? parseInt(el.value,10) : null;
+}
+
+function calcRiskLevel(cash,debt,profit){
+  if(cash===0 || (profit===0 && debt===0)) return "危険";
+  if(cash===2 && debt===2 && profit===2) return "安全";
+  return "要注意";
+}
+
+function calcType(cash,debt,profit){
+  // 優先順位：資金ショート > 返済圧迫 > 収益不安 > 資金耐久 > バランス
+  if(cash===0) return "資金ショート型";
+  if(debt===0) return "返済圧迫型";
+  if(profit===0 || profit===1) return "収益不安型";
+  if(cash===2) return "資金耐久型";
+  return "バランス型";
+}
+
+function typePoints(type){
+  switch(type){
+    case "資金ショート型":
+      return [
+        "固定費（人件費・家賃・外注費）の把握と、何ヶ月耐えられるか",
+        "売掛回収と支払いサイトのズレ（回収が遅いほど危険）",
+        "『止まった瞬間』に必要になる資金の最低ライン"
+      ];
+    case "返済圧迫型":
+      return [
+        "返済日後に資金残がマイナスにならないか（資金推移）",
+        "借入の条件（期間・金利・返済方法）と見直し余地",
+        "税金・賞与・設備投資など“ドン”と出る月の把握"
+      ];
+    case "収益不安型":
+      return [
+        "粗利率（値上げ/外注/仕入れ）の変化と原因",
+        "固定費の見直し余地（1割削減で何が変わるか）",
+        "赤字が『一時的』か『構造的』か"
+      ];
+    case "資金耐久型":
+      return [
+        "現預金が厚いほど大きい突発損失リスク（事故・災害等）の整理",
+        "代表者/キーマン不在で止まる業務がどこか",
+        "成長投資の優先順位（攻めるなら守りもセット）"
+      ];
+    default:
+      return [
+        "資金（手元）・返済・利益のどこがボトルネックか",
+        "月次で見たい数字（売上/粗利/固定費/資金残）",
+        "決算期前に“守り”の論点を洗い出す"
+      ];
+  }
+}
+
+function badgeHtml(level){
+  if(level==="危険") return '<span class="pill danger">🔴 危険</span>';
+  if(level==="安全") return '<span class="pill safe">🟢 安全</span>';
+  return '<span class="pill warn">🟡 要注意</span>';
+}
+
+function buildShareLine(level, type){
+  // スクショで伝わる一文（短く・論点が立つ）
+  // 例：「要注意｜返済圧迫型：返済と資金残のズレを点検」
+  let hook = "";
+  if(type==="資金ショート型") hook = "資金の耐久月数を最優先で点検";
+  else if(type==="返済圧迫型") hook = "返済後の資金残推移を点検";
+  else if(type==="収益不安型") hook = "粗利と固定費の構造を点検";
+  else if(type==="資金耐久型") hook = "代表者不在時の停止点を点検";
+  else hook = "資金・返済・利益の弱点を点検";
+  return `${level}｜${type}：${hook}`;
+}
+
+function buildPrefillUrl(payload){
+  const params = new URLSearchParams();
+  params.set(FORM_ENTRY.level, payload.level);
+  params.set(FORM_ENTRY.type, payload.type);
+  params.set(FORM_ENTRY.share, payload.shareLine);
+
+  if(payload.email) params.set(FORM_ENTRY.email, payload.email);
+  if(payload.industry) params.set(FORM_ENTRY.industry, payload.industry);
+
+  // チェックボックスは「改行区切り」で通ることが多い
+  if(payload.topics && payload.topics.length){
+    params.set(FORM_ENTRY.topics, payload.topics.join("\n"));
+  }
+
+  return GOOGLE_FORM_PREFILL_URL + (GOOGLE_FORM_PREFILL_URL.includes("?") ? "&" : "?") + params.toString();
+}
+
+let lastPayload = null;
+
+function runJudge(){
+  const cash=getChecked("cash");
+  const debt=getChecked("debt");
+  const profit=getChecked("profit");
+  if(cash===null||debt===null||profit===null){
+    alert("すべて選択してください。");
+    return;
+  }
+
+  const level=calcRiskLevel(cash,debt,profit);
+  const type=calcType(cash,debt,profit);
+  const shareLine = buildShareLine(level, type);
+
+  const badges = badgeHtml(level) + ` <span class="pill type">🧩 ${type}</span>`;
+  $("resultBadges").innerHTML = badges;
+  $("shareLine").textContent = shareLine;
+
+  let text="";
+  if(level==="危険") text="短期的な資金の詰まり（または返済圧迫）の可能性があります。早期に状況整理を推奨します。";
+  else if(level==="安全") text="現状は健全です。タイプに合わせて弱点がないかだけ点検すると安心です。";
+  else text="現状は維持されていますが、外部環境変化に備えて弱点の点検が有効です。";
+  $("resultText").innerHTML = `<div class="muted">${text}</div>`;
+
+  const pts = typePoints(type);
+  const ul = $("points");
+  ul.innerHTML="";
+  pts.forEach(p => ul.innerHTML += `<li>${p}</li>`);
+
+  lastPayload = { level, type, shareLine };
+
+  $("resultCard").classList.remove("hide");
+  $("leadCard").classList.remove("hide");
+  window.scrollTo({top:$("resultCard").offsetTop,behavior:"smooth"});
+}
+
+$("btnJudge").addEventListener("click", runJudge);
+
+$("btnRecalc").addEventListener("click", () => {
+  window.scrollTo({top:$("diagCard").offsetTop,behavior:"smooth"});
+});
+
+$("btnCopy").addEventListener("click", async () => {
+  try{
+    await navigator.clipboard.writeText($("shareLine").textContent);
+    $("btnCopy").textContent = "コピーしました";
+    setTimeout(()=> $("btnCopy").textContent="一文をコピー", 1200);
+  }catch(e){
+    alert("コピーできませんでした。手動で選択してコピーしてください。");
+  }
+});
+
+$("btnSend").addEventListener("click", () => {
+  if(!lastPayload){
+    alert("先に診断してください。");
+    return;
+  }
+  const email = $("email").value.trim();
+  const industry = $("industry").value;
+  const topics = Array.from(document.querySelectorAll('#topics input[type="checkbox"]:checked'))
+    .map(x => x.value);
+
+  const payload = { ...lastPayload, email, industry, topics };
+  const url = buildPrefillUrl(payload);
+
+  $("sendNote").textContent = "Googleフォームを開きます（最終送信はフォーム側で行います）。";
+  window.open(url, "_blank");
+});
+</script>
+</body>
+</html>
