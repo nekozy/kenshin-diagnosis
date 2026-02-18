@@ -21,9 +21,11 @@ h2{font-size:16px; margin:0 0 10px}
 .danger{background:#fee2e2}
 .warn{background:#fef3c7}
 .safe{background:#dcfce7}
+.type{background:#e0e7ff}
 .input, select{width:100%; padding:12px; border-radius:12px; border:1px solid #e5e7eb; font-size:15px; margin-top:8px}
 .check label{display:flex; gap:8px; align-items:flex-start; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; margin:8px 0; cursor:pointer}
 .hide{display:none}
+ul{margin:10px 0 0 18px}
 </style>
 </head>
 
@@ -59,16 +61,22 @@ h2{font-size:16px; margin:0 0 10px}
 <label><input type="radio" name="profit" value="2">黒字</label>
 </div>
 
-<button class="btn btnPrimary" onclick="judge()">判定する</button>
+<button class="btn btnPrimary" onclick="runJudge()">判定する</button>
 </div>
 
 <div class="card hide" id="resultCard">
 <h2>判定結果</h2>
-<div id="resultBadge"></div>
+
+<div id="resultBadges"></div>
 <div id="resultText" style="margin-top:10px;"></div>
 
+<div class="card" style="box-shadow:none; border:1px solid #e5e7eb; margin-top:12px;">
+  <b>このタイプで確認すると速いポイント</b>
+  <ul id="points"></ul>
+</div>
+
 <div style="margin-top:18px;">
-<button class="btn btnGhost" onclick="location.reload()">入力をやり直す</button>
+  <button class="btn btnGhost" onclick="location.reload()">入力をやり直す</button>
 </div>
 </div>
 
@@ -90,7 +98,6 @@ h2{font-size:16px; margin:0 0 10px}
 </select>
 
 <div style="margin-top:12px;"><b>相談テーマ（任意）</b></div>
-
 <div class="check">
 <label><input type="checkbox">資金繰り</label>
 <label><input type="checkbox">借入返済</label>
@@ -100,55 +107,105 @@ h2{font-size:16px; margin:0 0 10px}
 </div>
 
 <button class="btn btnPrimary" style="margin-top:10px;">送信（後日連絡）</button>
-
 </div>
 
 </div>
 
 <script>
-function judge(){
-let cash=document.querySelector('input[name="cash"]:checked');
-let debt=document.querySelector('input[name="debt"]:checked');
-let profit=document.querySelector('input[name="profit"]:checked');
-
-if(!cash||!debt||!profit){
-alert("すべて選択してください。");
-return;
+function getChecked(name){
+  const el=document.querySelector(`input[name="${name}"]:checked`);
+  return el ? parseInt(el.value,10) : null;
 }
 
-cash=parseInt(cash.value);
-debt=parseInt(debt.value);
-profit=parseInt(profit.value);
-
-let level="";
-let badge="";
-let text="";
-
-if(cash===0 || (profit===0 && debt===0)){
-level="危険";
-badge='<span class="pill danger">🔴 危険</span>';
-text="資金ショートまたは返済圧迫の可能性があります。早期の見直しが推奨されます。";
-}
-else if(cash===2 && debt===2 && profit===2){
-level="安全";
-badge='<span class="pill safe">🟢 安全</span>';
-text="現状は健全な状態です。継続的なモニタリングをおすすめします。";
-}
-else{
-level="要注意";
-badge='<span class="pill warn">🟡 要注意</span>';
-text="現状は維持されていますが、外部環境変化に注意が必要です。";
+function calcRiskLevel(cash,debt,profit){
+  // 危険：資金<1ヶ月 or (赤字 and 返済きつい)
+  if(cash===0 || (profit===0 && debt===0)) return "危険";
+  // 安全：資金>=3ヶ月 and 黒字 and 返済余裕
+  if(cash===2 && debt===2 && profit===2) return "安全";
+  // その他
+  return "要注意";
 }
 
-document.getElementById("resultBadge").innerHTML=badge;
-document.getElementById("resultText").innerHTML=text;
+function calcType(cash,debt,profit){
+  // 優先順位：資金ショート > 返済圧迫 > 収益不安 > バランス/資金耐久
+  if(cash===0) return "資金ショート型";
+  if(debt===0) return "返済圧迫型";
+  if(profit===0 || profit===1) return "収益不安型";
+  if(cash===2) return "資金耐久型";
+  return "バランス型";
+}
 
-document.getElementById("resultCard").classList.remove("hide");
-document.getElementById("leadCard").classList.remove("hide");
+function typePoints(type){
+  switch(type){
+    case "資金ショート型":
+      return [
+        "固定費（人件費・家賃・外注費）の把握と、何ヶ月耐えられるか",
+        "売掛回収と支払いサイトのズレ（回収が遅いほど危険）",
+        "『止まった瞬間』に必要になる資金の金額感（最低ライン）"
+      ];
+    case "返済圧迫型":
+      return [
+        "年間返済額と、毎月の資金残の推移（返済日後にマイナスにならないか）",
+        "借入の条件（期間・金利・返済方法）と、見直し余地",
+        "設備投資・税金支払いなど“ドン”と出る月の把握"
+      ];
+    case "収益不安型":
+      return [
+        "粗利率（値上げ/外注/仕入れの影響）と、利益が落ちた要因",
+        "固定費の見直し余地（1割削減で何が変わるか）",
+        "赤字が『一時的』か『構造的』か（原因が消えるか）"
+      ];
+    case "資金耐久型":
+      return [
+        "現預金が厚いほど狙われるリスク（突発損失・事故・訴訟・災害など）の整理",
+        "代表者/キーマン不在で止まる業務がどこか",
+        "成長投資の優先順位（攻めるなら守りもセット）"
+      ];
+    default:
+      return [
+        "資金（手元）・返済・利益の3点のどこがボトルネックか",
+        "月次で見たい数字（売上/粗利/固定費/資金残）",
+        "決算期前に“守り”の論点を洗い出す"
+      ];
+  }
+}
 
-window.scrollTo({top:document.getElementById("resultCard").offsetTop,behavior:"smooth"});
+function badgeHtml(level){
+  if(level==="危険") return '<span class="pill danger">🔴 危険</span>';
+  if(level==="安全") return '<span class="pill safe">🟢 安全</span>';
+  return '<span class="pill warn">🟡 要注意</span>';
+}
+
+function runJudge(){
+  const cash=getChecked("cash");
+  const debt=getChecked("debt");
+  const profit=getChecked("profit");
+  if(cash===null||debt===null||profit===null){
+    alert("すべて選択してください。");
+    return;
+  }
+
+  const level=calcRiskLevel(cash,debt,profit);
+  const type=calcType(cash,debt,profit);
+
+  const badges = badgeHtml(level) + ' <span class="pill type">🧩 ' + type + '</span>';
+  document.getElementById("resultBadges").innerHTML = badges;
+
+  let text="";
+  if(level==="危険") text="短期的な資金の詰まり（または返済圧迫）の可能性があります。早期に状況整理を推奨します。";
+  else if(level==="安全") text="現状は健全です。タイプに合わせて、弱点がないかだけ確認すると安心です。";
+  else text="現状は維持されていますが、外部環境変化に備えて弱点の点検が有効です。";
+  document.getElementById("resultText").innerHTML = text;
+
+  const pts = typePoints(type);
+  const ul = document.getElementById("points");
+  ul.innerHTML="";
+  pts.forEach(p => ul.innerHTML += `<li>${p}</li>`);
+
+  document.getElementById("resultCard").classList.remove("hide");
+  document.getElementById("leadCard").classList.remove("hide");
+  window.scrollTo({top:document.getElementById("resultCard").offsetTop,behavior:"smooth"});
 }
 </script>
-
 </body>
 </html>
